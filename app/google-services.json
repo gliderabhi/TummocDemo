@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "356318050196",
+    "firebase_url": "https://tummoc-duplicate-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "tummoc-duplicate",
+    "storage_bucket": "tummoc-duplicate.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:356318050196:android:a851a333b42edce5060181",
+        "android_client_info": {
+          "package_name": "com.example.tummocduplicate"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "356318050196-s7r87kkps6brblc7mumd27l29j7jqufo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOYvLivzlrO6GlwXGiZWlCX6h7lD4SZHc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "356318050196-s7r87kkps6brblc7mumd27l29j7jqufo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
