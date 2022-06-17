@@ -31,21 +31,17 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this).get(ListOfRoutesViewModel::class.java)
         initializeDatabase()
-//        viewModel.getTummocDataFromFile(applicationContext)
         lifecycleScope.launch(Dispatchers.IO) {
             viewModel.getDataFromFirebase()
         }
         setContent {
             TummocDuplicateTheme {
-                // A surface container using the 'background' color from the theme
                 MainView(viewModel, applicationContext)
             }
         }
     }
 
     private fun initializeDatabase() {
-//        viewModel.database =
-//            Room.databaseBuilder(applicationContext, AppDatabase::class.java, "TummocDb").build()
     }
 
     @Composable

@@ -34,6 +34,8 @@ import com.example.tummocduplicate.bean.Route
 import com.example.tummocduplicate.bean.RouteMediumEnum
 import com.example.tummocduplicate.bean.TummocBaseJsonItem
 import com.example.tummocduplicate.viewModel.ListOfRoutesViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 val metroClicked = mutableStateOf(false)
 
@@ -45,6 +47,7 @@ fun ListOfRoutes(viewModel: ListOfRoutesViewModel, applicationContext: Context) 
     LaunchedEffect(key1 = viewModel.possibleRoutes.value) {
         possibleRoutes.value = viewModel.possibleRoutes.value ?: ArrayList()
     }
+    val coroutineScope = rememberCoroutineScope()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -56,50 +59,51 @@ fun ListOfRoutes(viewModel: ListOfRoutesViewModel, applicationContext: Context) 
             HeaderToFromLayout(possibleRoutes)
             Spacer(modifier = Modifier.height(50.dp))
             MiddleSection(clickHandle = {
-                var list = ArrayList<TummocBaseJsonItem>()
-                possibleRoutes.value = viewModel.possibleRoutes.value ?: ArrayList()
-                when (it) {
-                    0 -> {
-                        list = ArrayList()
-                        for (v in possibleRoutes.value) {
-                            for (r in v.routes) {
-                                if (r.medium == RouteMediumEnum.Train.value) {
-                                    list.add(v)
-                                    break
+                coroutineScope.launch(Dispatchers.IO) {
+                    val list: ArrayList<TummocBaseJsonItem>
+                    possibleRoutes.value = viewModel.possibleRoutes.value ?: ArrayList()
+                    when (it) {
+                        0 -> {
+                            list = ArrayList()
+                            for (v in possibleRoutes.value) {
+                                for (r in v.routes) {
+                                    if (r.medium == RouteMediumEnum.Train.value) {
+                                        list.add(v)
+                                        break
+                                    }
                                 }
                             }
+                            possibleRoutes.value = list
                         }
-                        possibleRoutes.value = list
-                    }
-                    1 -> {
-                        list = ArrayList()
-                        for (v in possibleRoutes.value) {
-                            for (r in v.routes) {
-                                if (r.medium == RouteMediumEnum.Bus.value) {
-                                    list.add(v)
-                                    break
+                        1 -> {
+                            list = ArrayList()
+                            for (v in possibleRoutes.value) {
+                                for (r in v.routes) {
+                                    if (r.medium == RouteMediumEnum.Bus.value) {
+                                        list.add(v)
+                                        break
+                                    }
                                 }
                             }
+                            possibleRoutes.value = list
                         }
-                        possibleRoutes.value = list
-                    }
-                    2 -> {
-                        list = ArrayList()
-                        for (v in possibleRoutes.value) {
-                            for (r in v.routes) {
-                                if (r.medium == RouteMediumEnum.Walk.value) {
-                                    list.add(v)
-                                    break
+                        2 -> {
+                            list = ArrayList()
+                            for (v in possibleRoutes.value) {
+                                for (r in v.routes) {
+                                    if (r.medium == RouteMediumEnum.Walk.value) {
+                                        list.add(v)
+                                        break
+                                    }
                                 }
                             }
+                            possibleRoutes.value = list
                         }
-                        possibleRoutes.value = list
-                    }
 
 
+                    }
                 }
-            }
-            )
+            })
             Spacer(modifier = Modifier.height(50.dp))
             RoutesList(viewModel, applicationContext, possibleRoutes)
         } else {
