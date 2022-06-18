@@ -7,7 +7,8 @@ import java.nio.charset.StandardCharsets
 import java.util.*
 
 object Constants {
-
+    val LIST_OF_ROUTES_SCREEN = "listOfRoutes"
+    val MAPS_NAVIGATION_SCREEN = "mapsNavigation"
     var mActivity : MainActivity? = null
 
     fun loadJSONFromAsset(name: String?, context: Context): String {

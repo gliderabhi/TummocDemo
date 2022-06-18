@@ -2,6 +2,7 @@ package com.example.tummocduplicate.view
 
 import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -9,6 +10,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -20,8 +23,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -159,11 +164,29 @@ fun BottomList(
 
 @Composable
 fun RoutesComposable(routes: TummocBaseJsonItem, viewModel: ListOfRoutesViewModel) {
+    var selected by remember { mutableStateOf(false) }
+    val scale by animateFloatAsState(if (selected) 0.7f else 1f)
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .absolutePadding(left = 5.dp, right = 5.dp, bottom = 5.dp)
-            .border(width = 0.5.dp, shape = RoundedCornerShape(20.dp), color = Color.DarkGray),
+            .pointerInput(Unit) {
+                while (true) {
+                    awaitPointerEventScope {
+                        awaitFirstDown(false)
+                        selected = true
+                        waitForUpOrCancellation()
+                        selected = false
+                    }
+                }
+            }
+            .clickable {
+                viewModel.clickedRoute = routes.routes
+                viewModel.navController.navigate(Screens.Maps.route)
+            }
+            .border(width = 0.5.dp, shape = RoundedCornerShape(20.dp), color = Color.DarkGray)
+            .scale(scale),
         shape = RoundedCornerShape(20.dp)
     ) {
         Column(
