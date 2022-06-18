@@ -12,9 +12,11 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.gson.Gson
+import com.google.maps.android.compose.MapProperties
 
 class ListOfRoutesViewModel : ViewModel() {
 
+    lateinit var mapProperties : MapProperties
     lateinit var navController: NavHostController
     var firebaseRefrence: FirebaseDatabase? = null
     var response: Any? = null

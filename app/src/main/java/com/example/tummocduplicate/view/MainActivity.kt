@@ -10,6 +10,7 @@ import com.example.tummocduplicate.ui.theme.TummocDuplicateTheme
 import com.example.tummocduplicate.viewModel.ListOfRoutesViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.jar.Manifest
 
 class MainActivity : ComponentActivity() {
     private lateinit var viewModel: ListOfRoutesViewModel
@@ -19,6 +20,7 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             viewModel.getDataFromFirebase()
         }
+
         setContent {
             TummocDuplicateTheme {
                 viewModel.navController = rememberNavController()
