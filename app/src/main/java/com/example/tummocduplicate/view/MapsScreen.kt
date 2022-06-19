@@ -367,7 +367,7 @@ fun MapsComponent(
     }
 }
 
-private fun bitMapFromVector(vectorResID: Int, context: Context): BitmapDescriptor {
+fun bitMapFromVector(vectorResID: Int, context: Context): BitmapDescriptor {
     val vectorDrawable = ContextCompat.getDrawable(context, vectorResID)
     vectorDrawable!!.setBounds(
         0,
@@ -421,19 +421,19 @@ private fun HeaderBackButton(
 
         Row(
             modifier = Modifier
+                .align(Alignment.TopEnd)
+                .absolutePadding(right = 20.dp, top = 20.dp)
                 .background(
                     color = Color(0xFFC4d2d2),
                     shape = RoundedCornerShape(10.dp)
                 )
                 .padding(all = 5.dp)
-                .absolutePadding(right = 20.dp, top = 20.dp)
-                .align(Alignment.TopEnd)
         ) {
             Image(
                 painter = painterResource(id = R.drawable.ic_error),
                 contentDescription = "exclamation",
                 modifier = Modifier
-                    .size(20.dp)
+                    .size(15.dp)
                     .clickable { navHostController.navigate(Screens.Home.route) })
             Spacer(modifier = Modifier.width(5.dp))
             Text(

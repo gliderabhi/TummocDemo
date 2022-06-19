@@ -4,24 +4,24 @@ import android.os.Bundle
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.example.tummocduplicate.R
-import com.example.tummocduplicate.bean.RouteMediumEnum
 import com.example.tummocduplicate.viewModel.ListOfRoutesViewModel
 import com.google.android.libraries.maps.CameraUpdateFactory
 import com.google.android.libraries.maps.MapView
 import com.google.android.libraries.maps.model.CameraPosition
 import com.google.android.libraries.maps.model.LatLng
+import com.google.android.libraries.maps.model.MarkerOptions
 import com.google.android.libraries.maps.model.PolylineOptions
 import com.google.maps.android.ktx.awaitMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+
 
 @Composable
 fun rememberMapViewWithLifecycle(): MapView {
@@ -69,22 +69,26 @@ fun LoadMapView(
 ) {
     val mapView = rememberMapViewWithLifecycle()
     val clickedRoutes = viewModel.clickedRoute
-    val polyLines = remember {
-        mutableStateOf<HashMap<LatLng, String>>(HashMap())
-    }
     val polyLinesList = remember {
-        mutableListOf<LatLng>()
+        mutableStateOf<ArrayList<PolylineOptions>>(ArrayList())
+    }
+    val points = remember {
+        mutableStateOf<HashMap<LatLng, String>>(HashMap())
     }
     LaunchedEffect(key1 = viewModel.clickedRoute) {
         setupCameraPositionAndZoom(viewModel, clickedRoutes[0])
         launch(Dispatchers.IO) {
             for (i in viewModel.clickedRoute) {
-                val latLong1 = LatLng(i.sourceLat, i.sourceLong)
-                val latLong2 = LatLng(i.destinationLat, i.destinationLong)
-                polyLines.value[latLong1] = i.medium
-                polyLines.value[latLong2] = ""
-                polyLinesList.add(latLong1)
-                polyLinesList.add(latLong2)
+                val src = LatLng(i.sourceLat, i.sourceLong)
+                val dest = LatLng(i.destinationLat, i.destinationLong)
+
+                points.value[src] = i.medium
+                points.value[dest] = ""
+                val line = PolylineOptions().add(
+                    src,
+                    dest
+                ).width(2f).color(getRouteColor(i).value.toInt()).geodesic(true)
+                polyLinesList.value.add(line)
             }
         }
     }
@@ -104,6 +108,7 @@ fun LoadMapView(
             0f, 0f
         )
     }
+    val context = LocalContext.current
     Box(modifier = modifier) {
         AndroidView({ mapView }, modifier = modifier) {
             CoroutineScope(Dispatchers.Main).launch {
@@ -113,18 +118,14 @@ fun LoadMapView(
                         cameraPosition.value
                     )
                 )
-                for (i in clickedRoutes.indices - 1) {
-                    map.addPolyline(
-                        PolylineOptions().add(polyLinesList[i], polyLinesList[i + 1]).color(
-                            when (clickedRoutes[i].medium) {
-                                RouteMediumEnum.Bus.value -> Color(0xFFF3BB01).value.toInt()
-                                RouteMediumEnum.Walk.value -> Color(0xFF152238).value.toInt()
-                                RouteMediumEnum.Train.value -> Color(0xFFCD5E77).value.toInt()
-                                RouteMediumEnum.Metro.value -> Color.Red.value.toInt()
-                                else -> Color.Blue.value.toInt()
-                            }
-                        )
+
+                for(i in points.value.iterator()) {
+                    map.addMarker(
+                        MarkerOptions().position(i.key)
                     )
+                }
+                for (i in polyLinesList.value) {
+                    map.addPolyline(i)
                 }
 
             }
@@ -132,3 +133,5 @@ fun LoadMapView(
         }
     }
 }
+
+

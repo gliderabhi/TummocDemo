@@ -1,6 +1,5 @@
 package com.example.tummocduplicate.view
 
-import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -42,10 +41,8 @@ import com.example.tummocduplicate.viewModel.ListOfRoutesViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-val metroClicked = mutableStateOf(false)
-
 @Composable
-fun ListOfRoutes(viewModel: ListOfRoutesViewModel, applicationContext: Context) {
+fun ListOfRoutes(viewModel: ListOfRoutesViewModel) {
     val possibleRoutes = remember {
         mutableStateOf(ArrayList<TummocBaseJsonItem>())
     }
@@ -110,7 +107,7 @@ fun ListOfRoutes(viewModel: ListOfRoutesViewModel, applicationContext: Context) 
                 }
             })
             Spacer(modifier = Modifier.height(50.dp))
-            RoutesList(viewModel, applicationContext, possibleRoutes)
+            RoutesList(viewModel, possibleRoutes)
         } else {
             CircularProgressIndicator(modifier = Modifier.size(30.dp))
         }
@@ -120,7 +117,6 @@ fun ListOfRoutes(viewModel: ListOfRoutesViewModel, applicationContext: Context) 
 @Composable
 private fun RoutesList(
     viewModel: ListOfRoutesViewModel,
-    applicationContext: Context,
     possibleRoutes: MutableState<ArrayList<TummocBaseJsonItem>>
 ) {
     AnimatedVisibility(
@@ -153,8 +149,7 @@ fun BottomList(
     possibleRoutes: MutableState<ArrayList<TummocBaseJsonItem>>
 ) {
     LazyColumn(
-        modifier = Modifier.fillMaxWidth(),
-//        verticalArrangement = Arrangement.spacedBy(10.dp)
+        modifier = Modifier.fillMaxWidth()
     ) {
         items(count = possibleRoutes.value.size, itemContent = {
             RoutesComposable(possibleRoutes.value.get(it), viewModel)
@@ -232,7 +227,6 @@ private fun SequenceOfPaths(routes: TummocBaseJsonItem, viewModel: ListOfRoutesV
         LazyRow(
             modifier = Modifier
                 .fillMaxWidth(),
-//                        .absolutePadding(right = 50.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             items(count = routes.routes.size, itemContent = {
@@ -246,13 +240,7 @@ private fun SequenceOfPaths(routes: TummocBaseJsonItem, viewModel: ListOfRoutesV
                 }
                 Image(
                     painter = painterResource(
-                        id = when (routes.routes[it].medium) {
-                            RouteMediumEnum.Bus.value -> R.drawable.ic_bus
-                            RouteMediumEnum.Walk.value -> R.drawable.ic_walk
-                            RouteMediumEnum.Train.value -> R.drawable.ic_train
-                            RouteMediumEnum.Metro.value -> R.drawable.ic_train
-                            else -> R.drawable.ic_bus
-                        }
+                        id = getRouteDrawable(routes.routes[it])
                     ),
                     contentDescription = "walk",
                     modifier = Modifier
@@ -364,13 +352,7 @@ private fun ItemBarAndCategoryIcon(i: Route) {
                 .fillMaxWidth()
                 .height(10.dp)
                 .background(
-                    color = when (i.medium) {
-                        RouteMediumEnum.Bus.value -> Color(0xFFF3BB01)
-                        RouteMediumEnum.Walk.value -> Color(0xFF152238)
-                        RouteMediumEnum.Train.value -> Color(0xFFCD5E77)
-                        RouteMediumEnum.Metro.value -> Color.Red
-                        else -> Color.Blue
-                    }
+                    color = getRouteColor(i)
                 )
         ) {}
         Spacer(modifier = Modifier.height(10.dp))
@@ -383,13 +365,7 @@ private fun ItemBarAndCategoryIcon(i: Route) {
             Box(modifier = Modifier.fillMaxSize()) {
                 Image(
                     painter = painterResource(
-                        id = when (i.medium) {
-                            RouteMediumEnum.Bus.value -> R.drawable.ic_bus
-                            RouteMediumEnum.Walk.value -> R.drawable.ic_walk
-                            RouteMediumEnum.Train.value -> R.drawable.ic_train
-                            RouteMediumEnum.Metro.value -> R.drawable.ic_train
-                            else -> R.drawable.ic_bus
-                        }
+                        id = getRouteDrawable(i)
                     ),
                     contentDescription = "walk",
                     modifier = Modifier
@@ -399,6 +375,14 @@ private fun ItemBarAndCategoryIcon(i: Route) {
             }
         }
     }
+}
+
+fun getRouteDrawable(i: Route) = when (i.medium) {
+    RouteMediumEnum.Bus.value -> R.drawable.ic_bus
+    RouteMediumEnum.Walk.value -> R.drawable.ic_walk
+    RouteMediumEnum.Train.value -> R.drawable.ic_train
+    RouteMediumEnum.Metro.value -> R.drawable.ic_train
+    else -> R.drawable.ic_bus
 }
 
 @Composable
@@ -551,4 +535,14 @@ fun DestinationDetails(sourceTitle: String) {
         )
         Spacer(modifier = Modifier.width(20.dp))
     }
+}
+
+fun getRouteColor(
+    route: Route
+) = when (route.medium) {
+    RouteMediumEnum.Bus.value -> Color(0xFFF3BB01)
+    RouteMediumEnum.Walk.value -> Color(0xFF152238)
+    RouteMediumEnum.Train.value -> Color(0xFFCD5E77)
+    RouteMediumEnum.Metro.value -> Color.Red
+    else -> Color.Blue
 }

@@ -18,11 +18,11 @@ import com.example.tummocduplicate.R
 import com.example.tummocduplicate.viewModel.ListOfRoutesViewModel
 
 @Composable
-fun MainView(viewModel: ListOfRoutesViewModel, applicationContext: Context) {
+fun MainView(viewModel: ListOfRoutesViewModel) {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        ListOfRoutes(viewModel, applicationContext)
+        ListOfRoutes(viewModel)
         FloatingActionButton(
             onClick = { /*TODO*/ },
             modifier = Modifier

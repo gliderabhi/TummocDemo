@@ -17,7 +17,7 @@ fun SetupNavGraph(
         composable(
             route = Screens.Home.route
         ) {
-            MainView(viewModel, context)
+            MainView(viewModel)
         }
 
         composable(
