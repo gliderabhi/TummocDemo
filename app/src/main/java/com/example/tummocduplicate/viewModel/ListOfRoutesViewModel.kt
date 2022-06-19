@@ -8,23 +8,22 @@ import com.example.tummocduplicate.bean.MapData
 import com.example.tummocduplicate.bean.Route
 import com.example.tummocduplicate.bean.RouteMediumEnum
 import com.example.tummocduplicate.bean.TummocBaseJsonItem
-import com.google.android.gms.maps.model.LatLng
+import com.google.android.libraries.maps.model.LatLng
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.gson.Gson
-import com.google.maps.android.compose.MapProperties
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import kotlin.math.pow
 
 class ListOfRoutesViewModel : ViewModel() {
 
+    val permissionGranted = mutableStateOf(false)
     val zoomValuesList = HashMap<Int, Int>()
     var zoomValues: MutableState<Float> = mutableStateOf(9f)
-    lateinit var cameraPositionLatLong: MutableState<LatLng>
-    lateinit var mapProperties: MapProperties
+    var cameraPositionLatLong: MutableState<LatLng> = mutableStateOf(LatLng(0.0, 0.0))
     lateinit var navController: NavHostController
     var firebaseRefrence: FirebaseDatabase? = null
     var response: Any? = null

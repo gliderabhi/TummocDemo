@@ -13,9 +13,14 @@
         <entry key="../../../../layout/compose-model-1655043367492.xml" value="0.15572390572390574" />
         <entry key="../../../../layout/compose-model-1655043382702.xml" value="0.55" />
         <entry key="../../../../layout/compose-model-1655044483922.xml" value="0.335" />
+        <entry key="app/src/main/res/drawable/ic_bus.xml" value="0.223" />
+        <entry key="app/src/main/res/drawable/ic_bus_round_foreground.xml" value="0.223" />
         <entry key="app/src/main/res/drawable/ic_like_icon.xml" value="0.249" />
         <entry key="app/src/main/res/drawable/ic_next.xml" value="0.2345" />
+        <entry key="app/src/main/res/drawable/ic_outline_next_plan_24.xml" value="0.223" />
+        <entry key="app/src/main/res/drawable/ic_testing_drawable.xml" value="0.223" />
         <entry key="app/src/main/res/layout/activity_maps.xml" value="0.3302083333333333" />
+        <entry key="app/src/main/res/layout/map_layout.xml" value="0.34739583333333335" />
       </map>
     </option>
   </component>
