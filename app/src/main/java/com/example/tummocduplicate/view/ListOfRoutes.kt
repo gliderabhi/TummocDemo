@@ -240,7 +240,7 @@ private fun SequenceOfPaths(routes: TummocBaseJsonItem, viewModel: ListOfRoutesV
                 }
                 Image(
                     painter = painterResource(
-                        id = getRouteDrawable(routes.routes[it])
+                        id = getRouteDrawable(routes.routes[it].medium)
                     ),
                     contentDescription = "walk",
                     modifier = Modifier
@@ -365,7 +365,7 @@ private fun ItemBarAndCategoryIcon(i: Route) {
             Box(modifier = Modifier.fillMaxSize()) {
                 Image(
                     painter = painterResource(
-                        id = getRouteDrawable(i)
+                        id = getRouteDrawable(i.medium)
                     ),
                     contentDescription = "walk",
                     modifier = Modifier
@@ -377,7 +377,7 @@ private fun ItemBarAndCategoryIcon(i: Route) {
     }
 }
 
-fun getRouteDrawable(i: Route) = when (i.medium) {
+fun getRouteDrawable(i: String) = when (i) {
     RouteMediumEnum.Bus.value -> R.drawable.ic_bus
     RouteMediumEnum.Walk.value -> R.drawable.ic_walk
     RouteMediumEnum.Train.value -> R.drawable.ic_train

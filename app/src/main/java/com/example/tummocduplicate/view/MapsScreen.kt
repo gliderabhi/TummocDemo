@@ -220,10 +220,28 @@ private fun BusTrainPathTimeDurationInfoUI(route: Route) {
         )
 
         Spacer(modifier = Modifier.width(5.dp))
-        Text(text = "~ ${route.duration} mins ,\u20b9 ${route.fare}", fontSize = 12.sp)
+        Text(text = "~ ${getTime(route.duration)} ,\u20b9 ${route.fare}", fontSize = 12.sp)
 
 
     }
+}
+
+fun getTime(time: String): String {
+    var finalString = ""
+    try {
+        val times = time.split(":")
+        val day = times[0].toInt()
+        val hr = times[1].toInt()
+        val min = times[2].toInt()
+
+        if (day != 0) finalString += "$day hrs "
+        if (hr != 0) finalString += "$hr min "
+        if (min != 0) finalString += "$min sec"
+    } catch (e: Exception) {
+        e.printStackTrace()
+        finalString = time
+    }
+    return finalString
 }
 
 fun roundTheNumber(numInDouble: Double): String {
@@ -298,7 +316,7 @@ fun setupCameraPositionAndZoom(
         route.sourceLong
     )
     for (i in viewModel.zoomValuesList.iterator()) {
-        if (i.value < route.distance) {
+        if (i.value < route.distance * 1000) {
             viewModel.zoomValues.value = (i.key - 1).toFloat()
             break
         }

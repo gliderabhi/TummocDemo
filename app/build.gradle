@@ -5,6 +5,7 @@ plugins {
     id 'kotlin-parcelize'
     id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
 }
+apply plugin: 'com.google.gms.google-services'
 apply plugin: 'kotlin-kapt'
 android {
     compileSdk 32

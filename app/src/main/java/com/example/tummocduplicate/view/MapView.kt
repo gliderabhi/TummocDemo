@@ -13,6 +13,7 @@ import com.example.tummocduplicate.R
 import com.example.tummocduplicate.bean.RouteMediumEnum
 import com.example.tummocduplicate.viewModel.ListOfRoutesViewModel
 import com.google.android.libraries.maps.CameraUpdateFactory
+import com.google.android.libraries.maps.GoogleMap
 import com.google.android.libraries.maps.MapView
 import com.google.android.libraries.maps.model.CameraPosition
 import com.google.android.libraries.maps.model.LatLng
@@ -89,7 +90,14 @@ fun LoadMapView(
                 val line = PolylineOptions().add(
                     src,
                     dest
-                ).width(2f).geodesic(true).clickable(true).color(routesColor)
+                ).width(
+                    when {
+                        i.distance * 1000 < 1 -> 10f
+                        i.distance * 1000 < 10 -> 5f
+                        i.distance * 1000 < 50 -> 4f
+                        else -> 2f
+                    }
+                ).geodesic(true).clickable(true).color(routesColor)
                 polyLinesList.value.add(line)
             }
         }
@@ -115,6 +123,10 @@ fun LoadMapView(
         AndroidView({ mapView }, modifier = modifier) {
             CoroutineScope(Dispatchers.Main).launch {
                 val map = mapView.awaitMap()
+                map.isTrafficEnabled = true
+                map.uiSettings.setAllGesturesEnabled(true)
+                map.mapType = GoogleMap.MAP_TYPE_NORMAL
+                map.isBuildingsEnabled = true
                 map.moveCamera(
                     CameraUpdateFactory.newCameraPosition(
                         cameraPosition.value
@@ -124,6 +136,7 @@ fun LoadMapView(
                 for (i in points.value.iterator()) {
                     map.addMarker(
                         MarkerOptions().position(i.key)
+                            .icon(bitMapFromVector(getRouteDrawable(i.value), context))
                     )
                 }
                 for (i in polyLinesList.value) {
@@ -131,6 +144,7 @@ fun LoadMapView(
                 }
                 map.setOnPolylineClickListener {
                     it.width = 10f
+
                 }
             }
 
