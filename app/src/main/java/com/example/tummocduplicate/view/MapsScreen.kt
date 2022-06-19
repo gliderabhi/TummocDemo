@@ -18,13 +18,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.*
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.*
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
 import com.example.tummocduplicate.R
@@ -35,6 +36,7 @@ import com.google.android.libraries.maps.model.BitmapDescriptor
 import com.google.android.libraries.maps.model.BitmapDescriptorFactory
 import com.google.android.libraries.maps.model.LatLng
 import java.text.DecimalFormat
+import kotlin.math.roundToInt
 
 
 @Composable
@@ -91,65 +93,123 @@ fun PathSequence(modifier: Modifier, viewModel: ListOfRoutesViewModel, routes: L
 
 @Composable
 fun PickUpDropPointUi(route: Route, viewModel: ListOfRoutesViewModel) {
-    Card(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable {
-                setupCameraPositionAndZoom(viewModel, route)
-            }
-            .absolutePadding(left = 20.dp, right = 10.dp),
-        shape = RoundedCornerShape(10.dp)
+            .height(200.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .background(color = Color(0xFFf5f5f5))
-                .absolutePadding(left = 20.dp, right = 20.dp, top = 10.dp, bottom = 20.dp)
+                .fillMaxWidth(0.2f)
+                .fillMaxHeight()
         ) {
-            Text(text = "Get in station", fontSize = 10.sp, color = Color.LightGray)
-            Text(
-                text = route.sourceTitle,
-                fontSize = 14.sp,
-                color = Color.Black,
-                fontWeight = FontWeight.Bold,
+            Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .absolutePadding(right = 50.dp)
-            )
-//            Spacer(modifier = Modifier.height(5.dp))
+                    .height(40.dp)
+                    .width(2.dp)
+                    .background(color = getRouteColor(route))
+                    .align(Alignment.TopCenter)
+            ) {}
 
-            BusTrainPathTimeDurationInfoUI(route)
+            Box(modifier = Modifier
+                .align(Alignment.TopCenter)
+                .absolutePadding(top = 40.dp)) {
+                Image(
+                    painter = painterResource(id = getRouteDrawable(route.medium)),
+                    contentDescription = "",
+                    colorFilter = ColorFilter.tint(color = getRouteColor(route)),
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .absolutePadding(top = 70.dp, bottom = 70.dp)
+                    .width(2.dp)
+                    .background(color = getRouteColor(route))
+                    .align(Alignment.Center)
+            ) {}
 
-//            Spacer(modifier = Modifier.height(5.dp))
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = "NEXT SCHEDULE :", fontSize = 10.sp)
-                Spacer(modifier = Modifier.width(5.dp))
-                Text(text = "${getTime(route.sourceTime)} pm", fontSize = 10.sp)
-
-                Spacer(modifier = Modifier.width(15.dp))
-                Text(
-                    text = "${getTime(route.destinationTime)} pm",
-                    modifier = Modifier
-                        .background(color = Color(0xFF0000F0))
-                        .padding(5.dp),
-                    color = Color.White,
-                    fontSize = 10.sp
+            Box(modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .absolutePadding(bottom = 40.dp)) {
+                Image(
+                    painter = painterResource(id = getRouteDrawable(route.medium)),
+                    contentDescription = "",
+                    colorFilter = ColorFilter.tint(color = getRouteColor(route)),
+                    modifier = Modifier.align(Alignment.Center)
                 )
             }
 
-//            Spacer(modifier = Modifier.height(5.dp))
+            Row(
+                modifier = Modifier
+                    .height(40.dp)
+                    .width(2.dp)
+                    .background(color = getRouteColor(route))
+                    .align(Alignment.BottomCenter)
+            ) {}
 
-            Text(text = "Get down station", fontSize = 10.sp, color = Color.LightGray)
-            Text(
-                text = route.destinationTitle,
-                fontSize = 14.sp,
-                color = Color.Black,
-                fontWeight = FontWeight.Bold,
+        }
+        Card(
+            modifier = Modifier
+                .fillMaxWidth(1f)
+                .absolutePadding(right = 10.dp),
+            shape = RoundedCornerShape(10.dp)
+        ) {
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .absolutePadding(right = 50.dp)
-            )
+                    .background(color = Color(0xFFf5f5f5))
+                    .clickable {
+                        setupCameraPositionAndZoom(viewModel, route)
+                    }
+                    .absolutePadding(left = 20.dp, top = 10.dp, bottom = 20.dp)
+
+            ) {
+                Text(text = "Get in station", fontSize = 10.sp, color = Color.LightGray)
+                Text(
+                    text = route.sourceTitle,
+                    fontSize = 14.sp,
+                    color = Color.Black,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+//            Spacer(modifier = Modifier.height(5.dp))
+
+                BusTrainPathTimeDurationInfoUI(route)
+
+//            Spacer(modifier = Modifier.height(5.dp))
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(text = "NEXT SCHEDULE :", fontSize = 10.sp)
+                    Spacer(modifier = Modifier.width(5.dp))
+                    Text(text = "${getTime(route.sourceTime)} pm", fontSize = 10.sp)
+
+                    Spacer(modifier = Modifier.width(15.dp))
+                    Text(
+                        text = "${getTime(route.destinationTime)} pm",
+                        modifier = Modifier
+                            .background(color = Color(0xFF0000F0))
+                            .padding(5.dp),
+                        color = Color.White,
+                        fontSize = 10.sp
+                    )
+                }
+
+//            Spacer(modifier = Modifier.height(5.dp))
+
+                Text(text = "Get down station", fontSize = 10.sp, color = Color.LightGray)
+                Text(
+                    text = route.destinationTitle,
+                    fontSize = 14.sp,
+                    color = Color.Black,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+            }
         }
     }
 }
@@ -250,58 +310,89 @@ fun roundTheNumber(numInDouble: Double): String {
 
 @Composable
 fun SourceUI(route: Route, viewModel: ListOfRoutesViewModel) {
-    Card(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .absolutePadding(left = 20.dp, right = 10.dp)
-            .clickable {
-                setupCameraPositionAndZoom(viewModel, route)
-            },
-        shape = RoundedCornerShape(10.dp)
+            .height(150.dp)
     ) {
         Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .background(color = Color(0xFFf5f5f5))
-                .absolutePadding(left = 20.dp, right = 10.dp, top = 20.dp, bottom = 20.dp)
+                .fillMaxWidth(0.2f)
+                .fillMaxHeight()
         ) {
-            Column {
-                Text(text = "Source", fontSize = 12.sp, color = Color.LightGray)
-                Text(
-                    text = route.sourceTitle,
-                    fontSize = 14.sp,
-                    color = Color.Black,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .absolutePadding(right = 50.dp),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+            Row(modifier = Modifier
+                .align(Alignment.TopCenter)
+                .absolutePadding(top = 20.dp)) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_source_desti),
+                    contentDescription = "",
+                    colorFilter = ColorFilter.tint(color = getRouteColor(route))
                 )
-                Text(
-                    text = "Source",
-                    fontSize = 12.sp,
-                    color = Color(0xFFFFAA05)
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                BusTrainPathTimeDurationInfoUI(route = route)
             }
+            Row(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .absolutePadding(top = 50.dp)
+                    .width(2.dp)
+                    .background(color = getRouteColor(route))
+                    .align(Alignment.BottomCenter)
+            ) {}
+
+        }
+        Card(
+            modifier = Modifier
+                .fillMaxWidth(1f)
+                .absolutePadding(right = 10.dp),
+            shape = RoundedCornerShape(10.dp)
+        ) {
             Box(
                 modifier = Modifier
-                    .size(30.dp)
-                    .align(
-                        Alignment.TopEnd
-                    )
-                    .background(color = Color(0xFF708090), shape = RoundedCornerShape(30.dp))
+                    .fillMaxWidth()
+                    .background(color = Color(0xFFf5f5f5))
+                    .clickable {
+                        setupCameraPositionAndZoom(viewModel, route)
+                    }
+                    .absolutePadding(left = 20.dp, right = 10.dp, top = 20.dp, bottom = 20.dp)
+
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_location),
-                    contentDescription = "location",
+                Column {
+                    Text(text = "Source", fontSize = 12.sp, color = Color.LightGray)
+                    Text(
+                        text = route.sourceTitle,
+                        fontSize = 14.sp,
+                        color = Color.Black,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .absolutePadding(right = 50.dp),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        text = "Source",
+                        fontSize = 12.sp,
+                        color = Color(0xFFFFAA05)
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    BusTrainPathTimeDurationInfoUI(route = route)
+                }
+                Box(
                     modifier = Modifier
-                        .size(20.dp)
-                        .align(Alignment.Center),
-                    colorFilter = ColorFilter.tint(color = Color.White)
-                )
+                        .size(30.dp)
+                        .align(
+                            Alignment.TopEnd
+                        )
+                        .background(color = Color(0xFF708090), shape = RoundedCornerShape(30.dp))
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_location),
+                        contentDescription = "location",
+                        modifier = Modifier
+                            .size(20.dp)
+                            .align(Alignment.Center),
+                        colorFilter = ColorFilter.tint(color = Color.White)
+                    )
+                }
             }
         }
     }
@@ -325,41 +416,96 @@ fun setupCameraPositionAndZoom(
 
 @Composable
 fun DestinationUI(route: Route, viewModel: ListOfRoutesViewModel) {
-    Card(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable {
-                setupCameraPositionAndZoom(viewModel, route)
-            }
-            .absolutePadding(left = 20.dp, right = 10.dp, bottom = 10.dp),
-        shape = RoundedCornerShape(10.dp)
+            .height(150.dp)
     ) {
-        Column(
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .background(color = Color(0xFFf5f5f5))
-                .absolutePadding(left = 20.dp, right = 10.dp, top = 20.dp, bottom = 20.dp)
+                .fillMaxWidth(0.2f)
+                .fillMaxHeight()
         ) {
-            Text(text = "Destination", fontSize = 12.sp, color = Color.LightGray)
-            Text(
-                text = route.destinationTitle,
-                fontSize = 18.sp,
-                color = Color.Black,
-                fontWeight = FontWeight.Bold,
+            Row(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .absolutePadding(bottom = 50.dp)
+                    .width(2.dp)
+                    .align(Alignment.TopCenter)
+                    .background(color = getRouteColor(route))
+            ) {}
+            Box(modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .absolutePadding(bottom = 20.dp)) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_source_desti),
+                    contentDescription = "",
+                    colorFilter = ColorFilter.tint(color = getRouteColor(route)),
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+        }
+        Card(
+            modifier = Modifier
+                .fillMaxWidth(1f)
+                .absolutePadding(right = 10.dp, bottom = 10.dp),
+            shape = RoundedCornerShape(10.dp)
+        ) {
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .absolutePadding(right = 50.dp),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            Spacer(modifier = Modifier.height(10.dp))
-            Text(
-                text = "Source",
-                fontSize = 14.sp,
-                color = Color(0xFFFFAA05)
-            )
+                    .background(color = Color(0xFFf5f5f5))
+                    .clickable {
+                        setupCameraPositionAndZoom(viewModel, route)
+                    }
+                    .absolutePadding(left = 20.dp, right = 10.dp, top = 20.dp, bottom = 20.dp)
+
+            ) {
+                Text(text = "Destination", fontSize = 12.sp, color = Color.LightGray)
+                Text(
+                    text = route.destinationTitle,
+                    fontSize = 18.sp,
+                    color = Color.Black,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .absolutePadding(right = 50.dp),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    text = "Source",
+                    fontSize = 14.sp,
+                    color = Color(0xFFFFAA05)
+                )
+            }
         }
     }
+}
+
+private data class DottedShape(
+    val step: Dp,
+) : Shape {
+    override fun createOutline(
+        size: Size,
+        layoutDirection: LayoutDirection,
+        density: Density
+    ) = Outline.Generic(Path().apply {
+        val stepPx = with(density) { step.toPx() }
+        val stepsCount = (size.width / stepPx).roundToInt()
+        val actualStep = size.width / stepsCount
+        val dotSize = Size(width = actualStep / 2, height = size.height)
+        for (i in 0 until stepsCount) {
+            addRect(
+                Rect(
+                    offset = Offset(x = i * actualStep, y = 0f),
+                    size = dotSize
+                )
+            )
+        }
+        close()
+    })
 }
 
 @Composable
@@ -370,12 +516,13 @@ fun MapsComponent(
     clickable: (() -> Unit)? = null
 ) {
     Box(modifier) {
-        LoadMapView(viewModel = viewModel, modifier = Modifier
-            .fillMaxWidth()
-            .align(Alignment.TopCenter)
-            .clickable {
-                clickable?.invoke()
-            })
+        LoadMapView(
+            viewModel = viewModel, modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.TopCenter)
+                .clickable {
+                    clickable?.invoke()
+                })
         HeaderBackButton(
             modifier = Modifier
                 .fillMaxWidth()
@@ -411,41 +558,41 @@ private fun HeaderBackButton(
     Box(modifier = modifier) {
         Row(
             modifier = modifier
-                .align(Alignment.TopStart)
+                .align(Alignment.CenterStart)
                 .absolutePadding(left = 20.dp, top = 20.dp, right = 20.dp)
                 .clickable { navHostController.navigate(Screens.Home.route) },
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Row() {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_back),
-                    contentDescription = "back",
-                    modifier = Modifier
-                        .size(20.dp)
-                        .clickable { navHostController.navigate(Screens.Home.route) })
-                Spacer(modifier = Modifier.width(10.dp))
-                Text(
-                    text = "Beta",
-                    color = Color.Black,
-                    modifier = Modifier
-                        .background(
-                            color = Color.White,
-                            shape = RoundedCornerShape(10.dp)
-                        )
-                        .padding(5.dp)
-                )
-            }
+            Image(
+                painter = painterResource(id = R.drawable.ic_back),
+                contentDescription = "back",
+                modifier = Modifier
+                    .size(20.dp)
+                    .clickable { navHostController.navigate(Screens.Home.route) })
+            Spacer(modifier = Modifier.width(10.dp))
+            Text(
+                text = "Beta",
+                color = Color.Black,
+                modifier = Modifier
+                    .background(
+                        color = Color.White,
+                        shape = RoundedCornerShape(10.dp)
+                    )
+                    .padding(5.dp)
+            )
         }
 
         Row(
             modifier = Modifier
-                .align(Alignment.TopEnd)
+                .align(Alignment.CenterEnd)
                 .absolutePadding(right = 20.dp, top = 20.dp)
                 .background(
                     color = Color(0xFFC4d2d2),
                     shape = RoundedCornerShape(10.dp)
                 )
-                .padding(all = 5.dp)
+                .padding(all = 5.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
         ) {
             Image(
                 painter = painterResource(id = R.drawable.ic_error),
