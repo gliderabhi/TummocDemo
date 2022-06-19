@@ -10,6 +10,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.example.tummocduplicate.R
+import com.example.tummocduplicate.bean.RouteMediumEnum
 import com.example.tummocduplicate.viewModel.ListOfRoutesViewModel
 import com.google.android.libraries.maps.CameraUpdateFactory
 import com.google.android.libraries.maps.MapView
@@ -84,10 +85,11 @@ fun LoadMapView(
 
                 points.value[src] = i.medium
                 points.value[dest] = ""
+                val routesColor = getRoutesColor(i.medium)
                 val line = PolylineOptions().add(
                     src,
                     dest
-                ).width(2f).color(getRouteColor(i).value.toInt()).geodesic(true)
+                ).width(2f).geodesic(true).clickable(true).color(routesColor)
                 polyLinesList.value.add(line)
             }
         }
@@ -119,7 +121,7 @@ fun LoadMapView(
                     )
                 )
 
-                for(i in points.value.iterator()) {
+                for (i in points.value.iterator()) {
                     map.addMarker(
                         MarkerOptions().position(i.key)
                     )
@@ -127,11 +129,21 @@ fun LoadMapView(
                 for (i in polyLinesList.value) {
                     map.addPolyline(i)
                 }
-
+                map.setOnPolylineClickListener {
+                    it.width = 10f
+                }
             }
 
         }
     }
 }
+
+fun getRoutesColor(medium: String): Int = when (medium) {
+    RouteMediumEnum.Bus.value -> R.color.bus_color
+    RouteMediumEnum.Walk.value -> R.color.walk_color
+    RouteMediumEnum.Train.value -> R.color.train_walk
+    else -> R.color.bus_color
+}
+
 
 
