@@ -19,8 +19,8 @@ class MainActivity : ComponentActivity() {
         viewModel = ViewModelProvider(this).get(ListOfRoutesViewModel::class.java)
         lifecycleScope.launch(Dispatchers.IO) {
             viewModel.getDataFromFirebase()
+            viewModel.setupZoomValues()
         }
-
         setContent {
             TummocDuplicateTheme {
                 viewModel.navController = rememberNavController()
