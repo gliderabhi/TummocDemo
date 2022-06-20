@@ -311,7 +311,7 @@ private fun StaticDataForJourney(routes: TummocBaseJsonItem) {
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = "~ ${routes.totalDuration} mins",
+                text = "~ ${getTime(routes.totalDuration)}",
                 fontSize = 8.sp,
                 color = Color(0xFFFFA005),
                 fontWeight = FontWeight.Bold

@@ -163,11 +163,10 @@ fun LoadMapView(
                     val latlngHistory = it.points
                     val bc = LatLngBounds.Builder()
                     if (latlngHistory != null && latlngHistory.size != 0) {
-                        if (latlngHistory.size < 2) {
+                        if (latlngHistory.size >= 2) {
                             bc.include(latlngHistory.get(0))
                             bc.include(latlngHistory.get(latlngHistory.size - 1))
                         }
-                        //cardll is a layout refernce on which map is displaying
                         val width = size.value.width
                         val height = size.value.height
                         if (width != null && height != null) {

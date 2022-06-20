@@ -46,7 +46,7 @@ fun MapsScreen(viewModel: ListOfRoutesViewModel, navHostController: NavHostContr
 
     val mapHeight = animateFloatAsState(targetValue = viewModel.mapsHeight.value)
     val routes = viewModel.clickedRoute
-    setupCameraPositionAndZoom(viewModel, routes[0])
+//    setupCameraPositionAndZoom(viewModel, routes[0])
     Column(modifier = Modifier.fillMaxSize()) {
         MapsComponent(
             modifier = Modifier
