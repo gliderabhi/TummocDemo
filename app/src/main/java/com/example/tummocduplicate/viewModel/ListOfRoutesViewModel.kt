@@ -2,6 +2,7 @@ package com.example.tummocduplicate.viewModel
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
 import com.example.tummocduplicate.bean.MapData
@@ -20,6 +21,7 @@ import kotlin.math.pow
 
 class ListOfRoutesViewModel : ViewModel() {
 
+    val mapsHeight = mutableStateOf(0.5f)
     val permissionGranted = mutableStateOf(false)
     val zoomValuesList = HashMap<Int, Int>()
     var zoomValues: MutableState<Float> = mutableStateOf(9f)

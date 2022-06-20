@@ -21,6 +21,6 @@ data class Route(
     var sourceLong: Double = 0.0,
     var sourceTime: List<String> = listOf(),
     var sourceTitle: String = "",
-    var trails: @RawValue Any? = null,
+    var trails:  List<Trails>? = listOf(),
     var weight : Float? = null
 ) : Parcelable

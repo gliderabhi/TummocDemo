@@ -2,23 +2,24 @@ package com.example.tummocduplicate.view
 
 import android.os.Bundle
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.example.tummocduplicate.R
+import com.example.tummocduplicate.bean.Route
 import com.example.tummocduplicate.bean.RouteMediumEnum
 import com.example.tummocduplicate.viewModel.ListOfRoutesViewModel
 import com.google.android.libraries.maps.CameraUpdateFactory
 import com.google.android.libraries.maps.GoogleMap
 import com.google.android.libraries.maps.MapView
-import com.google.android.libraries.maps.model.CameraPosition
-import com.google.android.libraries.maps.model.LatLng
-import com.google.android.libraries.maps.model.MarkerOptions
-import com.google.android.libraries.maps.model.PolylineOptions
+import com.google.android.libraries.maps.model.*
 import com.google.maps.android.ktx.awaitMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -86,19 +87,30 @@ fun LoadMapView(
 
                 points.value[src] = i.medium
                 points.value[dest] = ""
+                val trails = i.trails
                 val routesColor = getRoutesColor(i.medium)
-                val line = PolylineOptions().add(
-                    src,
-                    dest
-                ).width(
-                    when {
-                        i.distance * 1000 < 1 -> 10f
-                        i.distance * 1000 < 10 -> 5f
-                        i.distance * 1000 < 50 -> 4f
-                        else -> 2f
+                val width = when {
+                    i.distance * 1000 < 1 -> 10f
+                    i.distance * 1000 < 10 -> 5f
+                    i.distance * 1000 < 50 -> 4f
+                    else -> 2f
+                }
+
+                if (trails != null && trails.isNotEmpty()) {
+                    val trailsList = mutableListOf<LatLng>()
+                    for (v in trails) {
+                        trailsList.add(LatLng(v.latitude, v.longitude))
                     }
-                ).geodesic(true).clickable(true).color(routesColor)
-                polyLinesList.value.add(line)
+                    val line = PolylineOptions().addAll(trailsList).width(width).geodesic(true)
+                        .clickable(true).color(routesColor)
+                    polyLinesList.value.add(line)
+                } else {
+                    val line = PolylineOptions().add(
+                        src,
+                        dest
+                    ).width(width).geodesic(true).clickable(true).color(routesColor)
+                    polyLinesList.value.add(line)
+                }
             }
         }
     }
@@ -119,8 +131,11 @@ fun LoadMapView(
         )
     }
     val context = LocalContext.current
-    Box(modifier = modifier) {
-        AndroidView({ mapView }, modifier = modifier) {
+    val size = remember {
+        mutableStateOf(IntSize.Zero)
+    }
+    Box(modifier = modifier.onSizeChanged { size.value = it }) {
+        AndroidView({ mapView }, modifier = Modifier.fillMaxSize()) {
             CoroutineScope(Dispatchers.Main).launch {
                 val map = mapView.awaitMap()
                 map.isTrafficEnabled = true
@@ -144,13 +159,35 @@ fun LoadMapView(
                 }
                 map.setOnPolylineClickListener {
                     it.width = 10f
-
+                    viewModel.mapsHeight.value = 0.7f
+                    val latlngHistory = it.points
+                    val bc = LatLngBounds.Builder()
+                    if (latlngHistory != null && latlngHistory.size != 0) {
+                        if (latlngHistory.size < 2) {
+                            bc.include(latlngHistory.get(0))
+                            bc.include(latlngHistory.get(latlngHistory.size - 1))
+                        }
+                        //cardll is a layout refernce on which map is displaying
+                        val width = size.value.width
+                        val height = size.value.height
+                        if (width != null && height != null) {
+                            map.moveCamera(
+                                CameraUpdateFactory.newLatLngBounds(
+                                    bc.build(),
+                                    width,
+                                    height,
+                                    60
+                                )
+                            )
+                        }
+                    }
                 }
             }
 
         }
     }
 }
+
 
 fun getRoutesColor(medium: String): Int = when (medium) {
     RouteMediumEnum.Bus.value -> R.color.bus_color

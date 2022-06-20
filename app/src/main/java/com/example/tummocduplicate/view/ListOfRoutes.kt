@@ -130,7 +130,7 @@ private fun RoutesList(
             Text(
                 text = "Fastest Route",
                 fontWeight = FontWeight.Bold,
-                fontSize = 20.sp,
+                fontSize = 18.sp,
                 color = Color.Black,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -150,6 +150,7 @@ fun BottomList(
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxWidth()
+            .absolutePadding(bottom = 20.dp)
     ) {
         items(count = possibleRoutes.value.size, itemContent = {
             RoutesComposable(possibleRoutes.value.get(it), viewModel)
@@ -187,7 +188,7 @@ fun RoutesComposable(routes: TummocBaseJsonItem, viewModel: ListOfRoutesViewMode
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .absolutePadding(left = 10.dp, right = 10.dp, bottom = 10.dp, top = 10.dp),
+                .absolutePadding(left = 10.dp, right = 10.dp, bottom = 20.dp, top = 10.dp),
             horizontalAlignment = Alignment.End
         ) {
             Row(
@@ -445,22 +446,22 @@ private fun HeaderToFromLayout(possibleRoutes: MutableState<ArrayList<TummocBase
         elevation = 10.dp
     ) {
         Row(modifier = Modifier.fillMaxWidth()) {
-            Spacer(modifier = Modifier.width(10.dp))
+            Spacer(modifier = Modifier.width(5.dp))
             Column() {
-                Spacer(modifier = Modifier.height(40.dp))
+                Spacer(modifier = Modifier.height(30.dp))
                 Image(
                     painter = painterResource(id = R.drawable.ic_back),
                     contentDescription = "back icon",
                     modifier = Modifier.size(20.dp)
                 )
             }
-//            Spacer(modifier = Modifier.width(10.dp))
+            Spacer(modifier = Modifier.width(10.dp))
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .absolutePadding(right = 20.dp)
             ) {
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(5.dp))
                 Text(
                     text = "Source",
                     color = Color.Gray,
@@ -468,9 +469,9 @@ private fun HeaderToFromLayout(possibleRoutes: MutableState<ArrayList<TummocBase
                     fontFamily = FontFamily.Serif,
                     modifier = Modifier.padding(horizontal = 15.dp)
                 )
-                Spacer(modifier = Modifier.height(5.dp))
+//                Spacer(modifier = Modifier.height(5.dp))
                 DestinationDetails(possibleRoutes.value[0].routes[0].sourceTitle)
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(5.dp))
                 Text(
                     text = "Destination",
                     color = Color.Gray,
@@ -478,7 +479,7 @@ private fun HeaderToFromLayout(possibleRoutes: MutableState<ArrayList<TummocBase
                     fontFamily = FontFamily.Serif,
                     modifier = Modifier.padding(horizontal = 15.dp)
                 )
-                Spacer(modifier = Modifier.height(5.dp))
+//                Spacer(modifier = Modifier.height(5.dp))
                 DestinationDetails(possibleRoutes.value[0].routes[possibleRoutes.value[0].routes.size - 1].destinationTitle)
             }
         }
@@ -490,7 +491,7 @@ fun DestinationDetails(sourceTitle: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .absolutePadding(bottom = 20.dp),
+            .absolutePadding(bottom = 5.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Row(
@@ -507,8 +508,8 @@ fun DestinationDetails(sourceTitle: String) {
         ) {
             Text(
                 text = sourceTitle,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Normal,
 //                fontFamily = FontFamily.Cursive,
                 fontStyle = FontStyle.Normal,
                 maxLines = 1,
@@ -517,9 +518,9 @@ fun DestinationDetails(sourceTitle: String) {
 //            Spacer(modifier = Modifier.height(5.dp))
             Text(
                 text = "Random nonsense text",
-                fontSize = 15.sp,
+                fontSize = 12.sp,
                 color = Color(0xFFFFA500),
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.Normal,
 //                fontFamily = FontFamily.Cursive,
                 fontStyle = FontStyle.Normal,
                 maxLines = 1,
@@ -531,7 +532,8 @@ fun DestinationDetails(sourceTitle: String) {
         Image(
             painter = painterResource(id = R.drawable.ic_like_icon),
             contentDescription = "like",
-            modifier = Modifier.size(30.dp)
+            modifier = Modifier.size(30.dp),
+            colorFilter = ColorFilter.tint(color = Color.LightGray)
         )
         Spacer(modifier = Modifier.width(20.dp))
     }

@@ -22,6 +22,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.*
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -41,10 +43,8 @@ import kotlin.math.roundToInt
 
 @Composable
 fun MapsScreen(viewModel: ListOfRoutesViewModel, navHostController: NavHostController) {
-    val mapsHeight = remember {
-        mutableStateOf(0.5f)
-    }
-    val mapHeight = animateFloatAsState(targetValue = mapsHeight.value)
+
+    val mapHeight = animateFloatAsState(targetValue = viewModel.mapsHeight.value)
     val routes = viewModel.clickedRoute
     setupCameraPositionAndZoom(viewModel, routes[0])
     Column(modifier = Modifier.fillMaxSize()) {
@@ -54,15 +54,13 @@ fun MapsScreen(viewModel: ListOfRoutesViewModel, navHostController: NavHostContr
                 .fillMaxHeight(mapHeight.value),
             navHostController,
             viewModel = viewModel
-        ) {
-            mapsHeight.value = 0.7f
-        }
+        )
         PathSequence(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight(1f)
                 .clickable {
-                    mapsHeight.value = 0.3f
+                    viewModel.mapsHeight.value = 0.3f
                 },
             viewModel,
             routes
@@ -93,28 +91,36 @@ fun PathSequence(modifier: Modifier, viewModel: ListOfRoutesViewModel, routes: L
 
 @Composable
 fun PickUpDropPointUi(route: Route, viewModel: ListOfRoutesViewModel) {
+    val size = remember { mutableStateOf(IntSize.Zero) }
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .height(200.dp),
+            .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
             modifier = Modifier
-                .fillMaxWidth(0.2f)
-                .fillMaxHeight()
+                .then(
+                    with(LocalDensity.current) {
+                        Modifier.size(
+                            width = 70.dp,
+                            height = ((size.value.height).toDp().value).dp,
+                        )
+                    }
+                )
         ) {
             Row(
                 modifier = Modifier
-                    .height(40.dp)
+                    .height(20.dp)
                     .width(2.dp)
                     .background(color = getRouteColor(route))
                     .align(Alignment.TopCenter)
             ) {}
 
-            Box(modifier = Modifier
-                .align(Alignment.TopCenter)
-                .absolutePadding(top = 40.dp)) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .absolutePadding(top = 20.dp)
+            ) {
                 Image(
                     painter = painterResource(id = getRouteDrawable(route.medium)),
                     contentDescription = "",
@@ -124,16 +130,23 @@ fun PickUpDropPointUi(route: Route, viewModel: ListOfRoutesViewModel) {
             }
             Row(
                 modifier = Modifier
-                    .fillMaxHeight()
-                    .absolutePadding(top = 70.dp, bottom = 70.dp)
-                    .width(2.dp)
+                    .then(
+                        with(LocalDensity.current) {
+                            Modifier.size(
+                                width = 2.dp,
+                                height = ((size.value.height).toDp().value - 90).dp,
+                            )
+                        }
+                    )
                     .background(color = getRouteColor(route))
                     .align(Alignment.Center)
             ) {}
 
-            Box(modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .absolutePadding(bottom = 40.dp)) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .absolutePadding(bottom = 20.dp)
+            ) {
                 Image(
                     painter = painterResource(id = getRouteDrawable(route.medium)),
                     contentDescription = "",
@@ -144,7 +157,7 @@ fun PickUpDropPointUi(route: Route, viewModel: ListOfRoutesViewModel) {
 
             Row(
                 modifier = Modifier
-                    .height(40.dp)
+                    .height(20.dp)
                     .width(2.dp)
                     .background(color = getRouteColor(route))
                     .align(Alignment.BottomCenter)
@@ -154,15 +167,19 @@ fun PickUpDropPointUi(route: Route, viewModel: ListOfRoutesViewModel) {
         Card(
             modifier = Modifier
                 .fillMaxWidth(1f)
-                .absolutePadding(right = 10.dp),
+                .absolutePadding(right = 10.dp)
+                .onSizeChanged {
+                    size.value = it
+                },
             shape = RoundedCornerShape(10.dp)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(color = Color(0xFFf5f5f5))
+                    .background(color = Color(0XFFE8F0F0))
                     .clickable {
                         setupCameraPositionAndZoom(viewModel, route)
+                        viewModel.mapsHeight.value = 0.5f
                     }
                     .absolutePadding(left = 20.dp, top = 10.dp, bottom = 20.dp)
 
@@ -310,15 +327,21 @@ fun roundTheNumber(numInDouble: Double): String {
 
 @Composable
 fun SourceUI(route: Route, viewModel: ListOfRoutesViewModel) {
+    val size = remember { mutableStateOf(IntSize.Zero) }
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(150.dp)
     ) {
         Box(
             modifier = Modifier
-                .fillMaxWidth(0.2f)
-                .fillMaxHeight()
+                .then(
+                    with(LocalDensity.current) {
+                        Modifier.size(
+                            width = 70.dp,
+                            height = ((size.value.height).toDp().value).dp,
+                        )
+                    }
+                )
         ) {
             Row(modifier = Modifier
                 .align(Alignment.TopCenter)
@@ -331,9 +354,14 @@ fun SourceUI(route: Route, viewModel: ListOfRoutesViewModel) {
             }
             Row(
                 modifier = Modifier
-                    .fillMaxHeight()
-                    .absolutePadding(top = 50.dp)
-                    .width(2.dp)
+                    .then(
+                        with(LocalDensity.current) {
+                            Modifier.size(
+                                width = 2.dp,
+                                height = ((size.value.height).toDp().value - 30).dp,
+                            )
+                        }
+                    )
                     .background(color = getRouteColor(route))
                     .align(Alignment.BottomCenter)
             ) {}
@@ -342,15 +370,19 @@ fun SourceUI(route: Route, viewModel: ListOfRoutesViewModel) {
         Card(
             modifier = Modifier
                 .fillMaxWidth(1f)
-                .absolutePadding(right = 10.dp),
+                .absolutePadding(right = 10.dp)
+                .onSizeChanged {
+                    size.value = it
+                },
             shape = RoundedCornerShape(10.dp)
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(color = Color(0xFFf5f5f5))
+                    .background(color = Color(0XFFE8F0F0))
                     .clickable {
                         setupCameraPositionAndZoom(viewModel, route)
+                        viewModel.mapsHeight.value = 0.5f
                     }
                     .absolutePadding(left = 20.dp, right = 10.dp, top = 20.dp, bottom = 20.dp)
 
@@ -416,21 +448,32 @@ fun setupCameraPositionAndZoom(
 
 @Composable
 fun DestinationUI(route: Route, viewModel: ListOfRoutesViewModel) {
+    val size = remember { mutableStateOf(IntSize.Zero) }
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(150.dp)
     ) {
         Box(
             modifier = Modifier
-                .fillMaxWidth(0.2f)
-                .fillMaxHeight()
+                .then(
+                    with(LocalDensity.current) {
+                        Modifier.size(
+                            width = 70.dp,
+                            height = ((size.value.height).toDp().value).dp,
+                        )
+                    }
+                )
         ) {
             Row(
                 modifier = Modifier
-                    .fillMaxHeight()
-                    .absolutePadding(bottom = 50.dp)
-                    .width(2.dp)
+                    .then(
+                        with(LocalDensity.current) {
+                            Modifier.size(
+                                width = 2.dp,
+                                height = ((size.value.height).toDp().value - 40).dp,
+                            )
+                        }
+                    )
                     .align(Alignment.TopCenter)
                     .background(color = getRouteColor(route))
             ) {}
@@ -448,15 +491,19 @@ fun DestinationUI(route: Route, viewModel: ListOfRoutesViewModel) {
         Card(
             modifier = Modifier
                 .fillMaxWidth(1f)
-                .absolutePadding(right = 10.dp, bottom = 10.dp),
+                .absolutePadding(right = 10.dp, bottom = 10.dp)
+                .onSizeChanged {
+                    size.value = it
+                },
             shape = RoundedCornerShape(10.dp)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(color = Color(0xFFf5f5f5))
+                    .background(color = Color(0XFFE8F0F0))
                     .clickable {
                         setupCameraPositionAndZoom(viewModel, route)
+                        viewModel.mapsHeight.value = 0.5f
                     }
                     .absolutePadding(left = 20.dp, right = 10.dp, top = 20.dp, bottom = 20.dp)
 
@@ -512,17 +559,14 @@ private data class DottedShape(
 fun MapsComponent(
     modifier: Modifier,
     navHostController: NavHostController,
-    viewModel: ListOfRoutesViewModel,
-    clickable: (() -> Unit)? = null
+    viewModel: ListOfRoutesViewModel
 ) {
     Box(modifier) {
         LoadMapView(
             viewModel = viewModel, modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.TopCenter)
-                .clickable {
-                    clickable?.invoke()
-                })
+        )
         HeaderBackButton(
             modifier = Modifier
                 .fillMaxWidth()
