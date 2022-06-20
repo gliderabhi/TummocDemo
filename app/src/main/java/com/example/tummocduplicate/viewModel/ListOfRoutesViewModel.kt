@@ -1,8 +1,8 @@
 package com.example.tummocduplicate.viewModel
 
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
 import com.example.tummocduplicate.bean.MapData
@@ -28,7 +28,7 @@ class ListOfRoutesViewModel : ViewModel() {
     var cameraPositionLatLong: MutableState<LatLng> = mutableStateOf(LatLng(0.0, 0.0))
     lateinit var navController: NavHostController
     var firebaseRefrence: FirebaseDatabase? = null
-    var response: Any? = null
+    var response = mutableStateOf<Any?>(null)
     val possibleRoutes = mutableStateOf<ArrayList<TummocBaseJsonItem>?>(ArrayList())
     lateinit var clickedRoute: List<Route>
 
@@ -39,41 +39,49 @@ class ListOfRoutesViewModel : ViewModel() {
     }
 
     suspend fun getDataFromFirebase() {
-        firebaseRefrence = FirebaseDatabase.getInstance()
-        firebaseRefrence?.getReference("tummoc")
-            ?.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(p0: DataSnapshot) {
-                    try {
-                        response = p0.value
-                        val json = Gson().fromJson(
-                            response.toString(),
-                            Array<TummocBaseJsonItem>::class.java
-                        )
-                        val itemsList: ArrayList<TummocBaseJsonItem> = ArrayList()
-                        for (i in json) {
-                            itemsList.add(i)
-                            for (v in i.routes) {
-                                v.weight = when(v.medium) {
-                                    RouteMediumEnum.Walk.value -> 0.3f
-                                    RouteMediumEnum.Bus.value -> 0.5f
-                                    RouteMediumEnum.Train.value -> 0.3f
-                                    RouteMediumEnum.Metro.value -> 0.5f
-                                    else -> 1f
+        try {
+            firebaseRefrence = FirebaseDatabase.getInstance()
+            firebaseRefrence?.getReference("tummoc")
+                ?.addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(p0: DataSnapshot) {
+                        try {
+                            response.value = p0.value
+                            Log.d("viewmodel", response.value.toString())
+                            val json = Gson().fromJson(
+                                response.value.toString(),
+                                Array<TummocBaseJsonItem>::class.java
+                            )
+                            val itemsList: ArrayList<TummocBaseJsonItem> = ArrayList()
+                            for (i in json) {
+                                Log.d("viewmodel objects", i.toString())
+                                itemsList.add(i)
+                                for (v in i.routes) {
+                                    v.weight = when (v.medium) {
+                                        RouteMediumEnum.Walk.value -> 0.3f
+                                        RouteMediumEnum.Bus.value -> 0.5f
+                                        RouteMediumEnum.Train.value -> 0.3f
+                                        RouteMediumEnum.Metro.value -> 0.5f
+                                        else -> 1f
+                                    }
+                                    if (i.routes.indexOf(v) == i.routes.size - 1) v.weight = 1f
                                 }
-                                if(i.routes.indexOf(v) == i.routes.size-1) v.weight = 1f
                             }
+
+                            Log.d("viewmodel", itemsList.toString())
+                            possibleRoutes.value = itemsList
+                        } catch (e: Exception) {
+                            e.printStackTrace()
                         }
-                        possibleRoutes.value = itemsList
-                    } catch (e: Exception) {
-                        e.printStackTrace()
                     }
-                }
 
-                override fun onCancelled(p0: DatabaseError) {
-                    TODO("Not yet implemented")
-                }
+                    override fun onCancelled(p0: DatabaseError) {
+                        TODO("Not yet implemented")
+                    }
 
-            })
+                })
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     fun getTotalTimeInMinutes(time: String): Long {

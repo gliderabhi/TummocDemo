@@ -11,6 +11,6 @@ data class Trails(
     var latitude: Double = 0.0,
     var longitude: Double = 0.0,
     var name: String = "",
-    var seq: Int = 0,
+    var seq: @RawValue Any? = null,
     var time: @RawValue Any? = null
 ) : Parcelable

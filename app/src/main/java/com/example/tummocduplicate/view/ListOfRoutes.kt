@@ -1,5 +1,6 @@
 package com.example.tummocduplicate.view
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -58,6 +59,7 @@ fun ListOfRoutes(viewModel: ListOfRoutesViewModel) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         if (possibleRoutes.value.isNotEmpty()) {
+            Log.d("listOfRoutes " , possibleRoutes.value.toString())
             HeaderToFromLayout(possibleRoutes)
             Spacer(modifier = Modifier.height(50.dp))
             MiddleSection(clickHandle = {
@@ -149,7 +151,8 @@ fun BottomList(
     possibleRoutes: MutableState<ArrayList<TummocBaseJsonItem>>
 ) {
     LazyColumn(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .absolutePadding(bottom = 20.dp)
     ) {
         items(count = possibleRoutes.value.size, itemContent = {
@@ -282,12 +285,14 @@ private fun StaticDataForJourney(routes: TummocBaseJsonItem) {
                 color = Color.Black,
                 fontWeight = FontWeight.Bold
             )
-            Text(
-                text = "${getTime(routes.routes[0].sourceTime)} pm",
-                fontSize = 8.sp,
-                color = Color(0xFFFFA005),
-                fontWeight = FontWeight.Bold
-            )
+            if (routes.routes.isNotEmpty()) {
+                Text(
+                    text = "${getTime(routes.routes[0].sourceTime)} pm",
+                    fontSize = 8.sp,
+                    color = Color(0xFFFFA005),
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
         Column {
             Text(
@@ -336,9 +341,14 @@ private fun StaticDataForJourney(routes: TummocBaseJsonItem) {
 }
 
 fun getTime(sourceTime: List<String>): String {
-    val time = sourceTime.get(0)
-    val t2 = time.split("[", "]")[0].split(":")
-    return "${t2[0]}:${t2[1]}"
+    return try {
+        val time = sourceTime.get(0)
+        val t2 = time.split("[", "]")[0].split(":")
+        "${t2[0]}:${t2[1]}"
+    } catch (e: Exception) {
+        e.printStackTrace()
+        ""
+    }
 }
 
 @Composable
@@ -416,11 +426,11 @@ private fun MiddleSection(clickHandle: (Int) -> Unit) {
         }) {
             Image(
                 painter = painterResource(id = R.drawable.ic_bus),
-                contentDescription = "bus",
+                contentDescription = "Bus",
                 colorFilter = ColorFilter.tint(color = if (selectedIndex.value == 1) Color.Black else Color.Gray)
             )
             Spacer(modifier = Modifier.width(5.dp))
-            Text(text = "bus")
+            Text(text = "Bus")
         }
         Row(modifier = Modifier.clickable {
             clickHandle(2)
@@ -428,11 +438,11 @@ private fun MiddleSection(clickHandle: (Int) -> Unit) {
         }) {
             Image(
                 painter = painterResource(id = R.drawable.ic_walk),
-                contentDescription = "walk",
+                contentDescription = "Walk",
                 colorFilter = ColorFilter.tint(color = if (selectedIndex.value == 2) Color.Black else Color.Gray)
             )
             Spacer(modifier = Modifier.width(5.dp))
-            Text(text = "walk")
+            Text(text = "Walk")
         }
     }
 }
@@ -470,7 +480,9 @@ private fun HeaderToFromLayout(possibleRoutes: MutableState<ArrayList<TummocBase
                     modifier = Modifier.padding(horizontal = 15.dp)
                 )
 //                Spacer(modifier = Modifier.height(5.dp))
-                DestinationDetails(possibleRoutes.value[0].routes[0].sourceTitle)
+                if (possibleRoutes.value.isNotEmpty() && possibleRoutes.value[0].routes.isNotEmpty()) {
+                    DestinationDetails(possibleRoutes.value[0].routes[0].sourceTitle ?: "Source")
+                }
                 Spacer(modifier = Modifier.height(5.dp))
                 Text(
                     text = "Destination",
@@ -480,7 +492,13 @@ private fun HeaderToFromLayout(possibleRoutes: MutableState<ArrayList<TummocBase
                     modifier = Modifier.padding(horizontal = 15.dp)
                 )
 //                Spacer(modifier = Modifier.height(5.dp))
-                DestinationDetails(possibleRoutes.value[0].routes[possibleRoutes.value[0].routes.size - 1].destinationTitle)
+
+                if (possibleRoutes.value.isNotEmpty() && possibleRoutes.value[0].routes.isNotEmpty()) {
+                    DestinationDetails(
+                        possibleRoutes.value[0].routes[possibleRoutes.value[0].routes.size - 1].destinationTitle
+                            ?: "Destination"
+                    )
+                }
             }
         }
     }
@@ -492,50 +510,69 @@ fun DestinationDetails(sourceTitle: String) {
         modifier = Modifier
             .fillMaxWidth()
             .absolutePadding(bottom = 5.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Row(
-            modifier = Modifier
-                .size(5.dp)
-                .clip(RoundedCornerShape(5.dp))
-                .background(color = Color.Red)
-        ) {}
-        Spacer(modifier = Modifier.width(10.dp))
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .absolutePadding(right = 70.dp)
-        ) {
-            Text(
-                text = sourceTitle,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Normal,
+        Row() {
+            Row(
+                modifier = Modifier
+                    .size(5.dp)
+                    .clip(RoundedCornerShape(5.dp))
+                    .background(color = Color.Red)
+            ) {}
+            Spacer(modifier = Modifier.width(10.dp))
+            Column(
+                modifier = Modifier
+                    .absolutePadding(right = 70.dp)
+            ) {
+                Text(
+                    text = sourceTitle,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Normal,
 //                fontFamily = FontFamily.Cursive,
-                fontStyle = FontStyle.Normal,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+                    fontStyle = FontStyle.Normal,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
 //            Spacer(modifier = Modifier.height(5.dp))
-            Text(
-                text = "Random nonsense text",
-                fontSize = 12.sp,
-                color = Color(0xFFFFA500),
-                fontWeight = FontWeight.Normal,
+                Text(
+                    text = "Random nonsense text",
+                    fontSize = 12.sp,
+                    color = Color(0xFFFFA500),
+                    fontWeight = FontWeight.Normal,
 //                fontFamily = FontFamily.Cursive,
-                fontStyle = FontStyle.Normal,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+                    fontStyle = FontStyle.Normal,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
 
+            }
         }
-        Spacer(modifier = Modifier.width(10.dp))
-        Image(
-            painter = painterResource(id = R.drawable.ic_like_icon),
-            contentDescription = "like",
-            modifier = Modifier.size(30.dp),
-            colorFilter = ColorFilter.tint(color = Color.LightGray)
-        )
-        Spacer(modifier = Modifier.width(20.dp))
+
+        val size = remember {
+            mutableStateOf(20)
+        }
+        Box(
+            modifier = Modifier
+                .width(60.dp)
+                .height(30.dp)
+                .absolutePadding(right = 30.dp)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_like_icon),
+                contentDescription = "like",
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .size(size.value.dp)
+                    .clickable {
+                        size.value = if (size.value == 20)
+                            30
+                        else
+                            20
+                    },
+                colorFilter = ColorFilter.tint(color = Color.Gray)
+            )
+        }
     }
 }
 

@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.rememberScrollState
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -18,16 +19,18 @@ class MainActivity : ComponentActivity() {
     private lateinit var viewModel: ListOfRoutesViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        getPermission()
+//        getPermission()
         viewModel = ViewModelProvider(this).get(ListOfRoutesViewModel::class.java)
         lifecycleScope.launch(Dispatchers.IO) {
             viewModel.getDataFromFirebase()
             viewModel.setupZoomValues()
         }
         setContent {
+            val v = rememberScrollState()
             TummocDuplicateTheme {
                 viewModel.navController = rememberNavController()
                 SetupNavGraph(viewModel.navController, viewModel, applicationContext)
+
             }
         }
     }
